@@ -39,8 +39,6 @@ const localGuardianSchema = z.object({
 const studentValidationZodSchema = z.object({
   id: z.string().trim(),
   name: userNameSchema,
-  password: z.string(),
-  age: z.number(),
   gender: z.enum(["male", "female", "other"]),
   dob: z.string(),
   email: z.string().email("Invalid email address!"),
@@ -65,7 +63,6 @@ const studentValidationZodSchema = z.object({
   guardian: guardianSchema,
   localGuardian: localGuardianSchema,
   profileImg: z.string(),
-  isActive: z.enum(["active", "disabled"]).default("active"),
   isDeleted: z.boolean().default(false),
 });
 
