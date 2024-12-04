@@ -42,7 +42,7 @@ const createStudentValidationSchema = z.object({
     student: z.object({
       name: userNameValidationSchema,
       gender: z.enum(["male", "female", "other"]),
-      dob: z.string(),
+      dob: z.date(),
       email: z.string().email("Invalid email address!"),
       contactNo: z.string().max(11, "Contact no must be 11 characters"),
       emergencyContactNo: z.string(),

@@ -26,7 +26,7 @@ export interface TStudent {
   name: TUserName;
   gender: "male" | "female" | "other";
   email: string;
-  dob: string;
+  dob: Date;
   contactNo: string;
   emergencyContactNo: string;
   bloodType:
