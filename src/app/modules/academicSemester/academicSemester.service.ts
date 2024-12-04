@@ -29,7 +29,24 @@ const updateAcademicSemester = async (
   id: string,
   payload: TPartialAcademicSemester,
 ) => {
-  const result = await AcademicSemester.findByIdAndUpdate(id, payload);
+  //* Academic Semester name and code checker
+  if (
+    (payload.name &&
+      AcademicSemesterNameCodeMapper[payload.name] !==
+        AcademicSemesterNameCodeMapper.code) ||
+    (payload.code &&
+      AcademicSemesterNameCodeMapper[payload.code] !==
+        AcademicSemesterNameCodeMapper.name) ||
+    (payload.name &&
+      payload.code &&
+      AcademicSemesterNameCodeMapper[payload.name] !== payload.code)
+  ) {
+    throw new Error("Invalid academic semester name and code");
+  }
+
+  const result = await AcademicSemester.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
   return result;
 };
 
