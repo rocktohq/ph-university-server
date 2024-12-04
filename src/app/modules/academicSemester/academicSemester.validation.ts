@@ -16,7 +16,7 @@ const createAcademicSemesterValidationSchema = z.object({
 });
 
 const updateAcademicSemesterValidationSchema = z.object({
-  ody: z.object({
+  body: z.object({
     name: z
       .enum([...AcademicSemesterNames] as [string, ...string[]])
       .optional(),
