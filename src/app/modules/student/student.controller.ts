@@ -1,68 +1,49 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response } from "express";
 import { StudentServices } from "./student.service";
+import sendResponse from "../../utils/sendRespons";
+import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 
-const getAllStudents = async (req: Request, res: Response) => {
-  try {
-    const result = await StudentServices.getAllStudentsFromDB();
-    res.status(200).send({
+const getAllStudents = catchAsync(async (req, res) => {
+  const result = await StudentServices.getAllStudentsFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Students fetched successfully!",
+    data: result,
+  });
+});
+
+const getSingleStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const result = await StudentServices.getSingleStudentFromDB(studentId);
+  if (result) {
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
-      message: "All students fetched successfully!",
+      message: "Student fetched successfully!",
       data: result,
     });
-  } catch (error: any) {
-    res.status(200).send({
+  } else {
+    sendResponse(res, {
+      statusCode: httpStatus.NOT_FOUND,
       success: true,
-      message: "Something went wrong!",
-      error,
-    });
-  }
-};
-
-const getSingleStudent = async (req: Request, res: Response) => {
-  try {
-    const { studentId } = req.params;
-    const result = await StudentServices.getSingleStudentFromDB(studentId);
-    if (result) {
-      res.status(200).send({
-        success: true,
-        message: "Student fetched successfully!",
-        data: result,
-      });
-    } else {
-      res.status(404).send({
-        success: false,
-        message: `No such student found with ID: ${studentId}!`,
-        data: {},
-      });
-    }
-  } catch (error: any) {
-    res.status(500).send({
-      success: false,
-      message: "Something went wrong!",
-      error,
-    });
-  }
-};
-
-const deleteStudent = async (req: Request, res: Response) => {
-  try {
-    const { studentId } = req.params;
-    const result = await StudentServices.deleteStudentFromDB(studentId);
-
-    res.status(200).send({
-      success: true,
-      message: "Student deleted successfuly!",
+      message: "Student not found!",
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).send({
-      success: false,
-      message: error.message || "Something went wrong!",
-      error,
-    });
   }
-};
+});
+
+const deleteStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const result = await StudentServices.deleteStudentFromDB(studentId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Student deleted successfully!",
+    data: result,
+  });
+});
 
 export const StudentControllers = {
   getAllStudents,

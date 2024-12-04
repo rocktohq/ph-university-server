@@ -1,27 +1,20 @@
-import { NextFunction, Request, Response } from "express";
 import { UserServices } from "./user.service";
+import sendResponse from "../../utils/sendRespons";
+import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { password, student: studentData } = req.body;
+const createStudent = catchAsync(async (req, res) => {
+  const { password, student: studentData } = req.body;
 
-    const result = await UserServices.createStudentToDB(password, studentData);
-    res.status(200).send({
-      success: true,
-      message: "Student created successfully!",
-      data: result,
-    });
-  } catch (err: any) {
-    // next(err);
-    res.status(400).send({
-      success: false,   
-      message: "Failed to create student!",
-      error: err.message || "An error occurred!",
-    });
-  }
-};
+  const result = await UserServices.createStudentToDB(password, studentData);
+
+  // Send response to client with status code 200 and success message and data.
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Student created successfully!",
+    data: result,
+  });
+});
+
 export const UserControllers = { createStudent };

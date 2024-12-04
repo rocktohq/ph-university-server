@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-const userNameSchema = z.object({
+const userNameValidationSchema = z.object({
   firstName: z
     .string()
-    .max(20, "Firstname can't be longer than 20 chars!")
+    .max(20, "Firstname can't be longer than 20 characters!")
     .refine(
       (value) =>
         value === value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
@@ -11,7 +11,7 @@ const userNameSchema = z.object({
     ),
   lastName: z
     .string()
-    .max(20, "Lastname can't be longer than 20 chars!")
+    .max(20, "Lastname can't be longer than 20 characters!")
     .refine(
       (value) =>
         value === value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
@@ -19,51 +19,56 @@ const userNameSchema = z.object({
     ),
 });
 
-const guardianSchema = z.object({
+const guardianValidationSchema = z.object({
   fatherName: z.string().trim(),
   fatherOccupation: z.string().trim(),
   fatherContactNo: z
     .string()
-    .max(11, "Contact no can't be more than 11 chars!"),
+    .max(11, "Contact no can't be more than 11 characters!"),
   motherName: z.string().trim(),
-  motherContactNo: z.string().max(11, "Contact no must be 11 chars!"),
+  motherContactNo: z.string().max(11, "Contact no must be 11 characters!"),
 });
 
-const localGuardianSchema = z.object({
+const localGuardianValidationSchema = z.object({
   name: z.string().trim(),
   occupation: z.string().trim(),
-  concatNo: z.string().max(11, "Contact no must be 11 chars!"),
+  concatNo: z.string().max(11, "Contact no must be 11 characters!"),
   address: z.string().trim(),
 });
 
-const studentValidationZodSchema = z.object({
-  id: z.string().trim(),
-  name: userNameSchema,
-  gender: z.enum(["male", "female", "other"]),
-  dob: z.string(),
-  email: z.string().email("Invalid email address!"),
-  contactNo: z.string().max(11, "Contact no must be 11 chars"),
-  emergencyContactNo: z.string(),
-  bloodType: z.enum([
-    "A",
-    "A+",
-    "A-",
-    "AB",
-    "AB+",
-    "AB-",
-    "B",
-    "B+",
-    "B-",
-    "O",
-    "O+",
-    "O-",
-  ]),
-  presentAddress: z.string().trim(),
-  permanentAddress: z.string().trim(),
-  guardian: guardianSchema,
-  localGuardian: localGuardianSchema,
-  profileImg: z.string(),
-  isDeleted: z.boolean().default(false),
+const createStudentValidationSchema = z.object({
+  body: z.object({
+    password: z.string().max(20, "Password must be less than 20 characters!"),
+    student: z.object({
+      name: userNameValidationSchema,
+      gender: z.enum(["male", "female", "other"]),
+      dob: z.string(),
+      email: z.string().email("Invalid email address!"),
+      contactNo: z.string().max(11, "Contact no must be 11 characters"),
+      emergencyContactNo: z.string(),
+      bloodType: z.enum([
+        "A",
+        "A+",
+        "A-",
+        "AB",
+        "AB+",
+        "AB-",
+        "B",
+        "B+",
+        "B-",
+        "O",
+        "O+",
+        "O-",
+      ]),
+      presentAddress: z.string().trim(),
+      permanentAddress: z.string().trim(),
+      guardian: guardianValidationSchema,
+      localGuardian: localGuardianValidationSchema,
+      profileImg: z.string(),
+    }),
+  }),
 });
 
-export default studentValidationZodSchema;
+export const studentValidations = {
+  createStudentValidationSchema,
+};
