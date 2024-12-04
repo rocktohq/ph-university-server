@@ -20,12 +20,21 @@ const createAcademicSemester = catchAsync(async (req, res) => {
 // Get all academic semesters
 const getAllAcademicSemesters = catchAsync(async (req, res) => {
   const result = await AcademicSemesterServices.getAllAcademicSemesters();
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "All academic semesters retrieved successfully!",
-    data: result,
-  });
+  if (result.length > 0) {
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "All academic semesters retrieved successfully!",
+      data: result,
+    });
+  } else {
+    sendResponse(res, {
+      statusCode: httpStatus.NOT_FOUND,
+      success: false,
+      message: "No academic semeter found!",
+      data: result,
+    });
+  }
 });
 
 // Get single academic semester
@@ -34,12 +43,21 @@ const getSingleAcademicSemester = catchAsync(async (req, res) => {
   const result =
     await AcademicSemesterServices.getSingleAcademicSemester(semersterId);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Academic Semester retrieved successfully!",
-    data: result,
-  });
+  if (result !== null) {
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Academic Semester retrieved successfully!",
+      data: result,
+    });
+  } else {
+    sendResponse(res, {
+      statusCode: httpStatus.NOT_FOUND,
+      success: false,
+      message: "Academic Semester not found!",
+      data: result,
+    });
+  }
 });
 
 // Update academic semester
