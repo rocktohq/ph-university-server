@@ -5,7 +5,7 @@ const academicFacultySchema = new Schema<TAcademicFaculty>(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Academic faculty name is required!"],
       unique: true,
     },
   },
@@ -29,6 +29,6 @@ academicFacultySchema.pre("save", async function (next) {
 });
 
 export const AcademicFaculty = model<TAcademicFaculty>(
-  "AcademicFaculty",
+  "AcademicFaculties",
   academicFacultySchema,
 );
