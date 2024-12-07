@@ -5,6 +5,9 @@ import { TStudent } from "../student/student.interface";
 import { Student } from "../student/student.model";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { generateStudentId } from "./user.utils";
+import mongoose from "mongoose";
+import AppError from "../../error/AppError";
+import httpStatus from "http-status";
 
 const createStudentToDB = async (password: string, payload: TStudent) => {
   const userData: Partial<TUser> = {};
@@ -18,25 +21,55 @@ const createStudentToDB = async (password: string, payload: TStudent) => {
   );
 
   if (admissionSemester === null) {
-    throw new Error("Academic Semester not found!");
+    throw new AppError(httpStatus.BAD_REQUEST, "Academic Semester not found!");
   }
 
   // Check if email exists
   const isEmailExists = await Student.isEmailExists(payload.email);
   if (isEmailExists) {
-    throw new Error("Email already exists!");
+    throw new AppError(httpStatus.BAD_REQUEST, "Email already exists!");
   }
 
-  userData.id = await generateStudentId(admissionSemester);
+  // Create new session
+  const session = await mongoose.startSession();
 
-  const newUser = await User.create(userData);
+  try {
+    // Start transection
+    session.startTransaction();
 
-  if (Object.keys(newUser).length) {
-    payload.id = newUser.id;
-    payload.user = newUser._id;
+    userData.id = await generateStudentId(admissionSemester);
 
-    const newStudent = await Student.create(payload);
+    const newUser = await User.create([userData], { session });
+
+    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Failed to create new user");
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    const newStudent = await Student.create([payload], { session });
+
+    if (!newStudent.length) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Failed to create new student",
+      );
+    }
+
+    // Commit the transaction
+    await session.commitTransaction();
+    await session.endSession();
+
     return newStudent;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      err?.message || "Failed to delete student!",
+    );
   }
 };
 

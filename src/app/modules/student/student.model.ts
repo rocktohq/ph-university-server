@@ -6,6 +6,8 @@ import {
   StudentModel,
   TUserName,
 } from "./student.interface";
+// import AppError from "../../error/AppError";
+// import httpStatus from "http-status";
 
 //* Schema
 const userNameSchema = new Schema<TUserName>({
@@ -183,29 +185,17 @@ const studentSchema = new Schema<TStudent, StudentModel>({
   admissionSemester: {
     type: Schema.Types.ObjectId,
     required: [true, "Admission semester is required!"],
-    ref: "AdmissionSemester",
+    ref: "AcademicSemesters",
+  },
+  academicDepartment: {
+    type: Schema.Types.ObjectId,
+    required: [true, "Academic department is required!"],
+    ref: "AcademicDepartments",
   },
   isDeleted: { type: Boolean, default: false },
 });
 
 //* Middlewares
-
-// Query Mddleware:
-studentSchema.pre("find", function (next) {
-  // Exclude deleted docs
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-studentSchema.pre("findOne", function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-studentSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
 
 //
 //* Instance Methods
@@ -214,19 +204,39 @@ studentSchema.pre("aggregate", function (next) {
 //   return existingUser;
 // };
 
+// Check if student exists
+// studentSchema.pre("findOne", async function (next) {
+//   const query = this.getQuery();
+//   const isStudentExists = await Student.findOne(query);
+
+//   if (!isStudentExists) {
+//     throw new AppError(httpStatus.NOT_FOUND, "Student does not exist!");
+//   }
+
+//   next();
+// });
+
+studentSchema.pre("find", function (next) {
+  // Exclude deleted docs
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+studentSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+studentSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
+
 //* Static Methods
-studentSchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await Student.findOne({ id });
+studentSchema.statics.isStudentExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id, isDeleted: { $ne: true } });
   return existingUser;
 };
 studentSchema.statics.isEmailExists = async function (email: string) {
-  return await Student.findOne({ email });
-};
-
-studentSchema.statics.isDeleted = async function (id: string) {
-  return await Student.findOne({
-    $and: [{ id }, { isDeleted: { $eq: true } }],
-  });
+  return await Student.findOne({ email, isDeleted: { $ne: true } });
 };
 
 //* Model

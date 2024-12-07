@@ -49,6 +49,7 @@ export interface TStudent {
   localGuardian: TLocalGuardian;
   profileImg?: string;
   admissionSemester: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
   isDeleted: boolean;
 }
 
@@ -65,7 +66,6 @@ export interface TStudent {
 
 //* Static Methods
 export interface StudentModel extends Model<TStudent> {
-  isUserExists(id: string): Promise<TStudent | null>;
+  isStudentExists(id: string): Promise<TStudent | null>;
   isEmailExists(email: string): Promise<TStudent | null>;
-  isDeleted(id: string): Promise<TStudent | null>;
 }
