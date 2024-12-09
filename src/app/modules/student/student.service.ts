@@ -1,5 +1,5 @@
 import httpStatus from "http-status";
-import AppError from "../../error/AppError";
+import AppError from "../../errors/AppError";
 import { Student } from "./student.model";
 import mongoose from "mongoose";
 import { User } from "../user/user.model";

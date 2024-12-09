@@ -8,4 +8,5 @@ export default {
   databaseURI: process.env.DATABASE_URI,
   saltRounds: process.env.BCRYPT_SALT_ROUNDS,
   defaultPassword: process.env.DEFAULT_PASSWORD,
+  environment: process.env.ENVIRONMENT,
 };
